@@ -104,7 +104,7 @@ const lest::test specification[] = {
     auto control = "C:\\Program Files\\CMake";
 #else
     auto base = "/opt";
-    auto control = "/opt/cmake";
+    auto control = "/opt/CMake";
 #endif
     auto result = lab::paths::Join(base, "CMake");
     EXPECT(control == result);
