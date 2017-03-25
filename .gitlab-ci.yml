@@ -11,7 +11,7 @@ test-windows-amd64:
     - cd build
     - cmake -G "Visual Studio 14 2015 Win64" ..
     - msbuild ALL_BUILD.vcxproj
-    - ctest -C Debug
+    - ctest -C Debug --output-on-failure
 
 test-windows-386:
   stage: test
@@ -22,7 +22,7 @@ test-windows-386:
     - cd build
     - cmake -G "Visual Studio 14 2015" ..
     - msbuild ALL_BUILD.vcxproj
-    - ctest -C Debug
+    - ctest -C Debug --output-on-failure
 
 test-linux-amd64:
   stage: test
@@ -33,7 +33,7 @@ test-linux-amd64:
     - cd build
     - cmake ..
     - make
-    - make test
+    - CTEST_OUTPUT_ON_FAILURE=1 make test
 
 test-linux-386:
   stage: test
@@ -44,7 +44,7 @@ test-linux-386:
     - cd build
     - cmake ..
     - make
-    - make test
+    - CTEST_OUTPUT_ON_FAILURE=1 make test
 
 test-macos-amd64:
   stage: test
@@ -55,4 +55,4 @@ test-macos-amd64:
     - cd build
     - cmake ..
     - make
-    - make test
+    - CTEST_OUTPUT_ON_FAILURE=1 make test

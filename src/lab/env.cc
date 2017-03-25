@@ -39,7 +39,9 @@ extern char **environ;
 namespace lab {
 namespace env {
 
+#if defined(LAB_WINDOWS)
 const int kMaxCharacters = 16 * 1024;
+#endif
 
 char **MergeBlocks (char **a, char **b) {
     size_t total_size = 0;
