@@ -27,6 +27,15 @@
 #include <lab/types.h>
 #include <lab/paths.h>
 
+#include <flatbuffers/flatbuffers.h>
+#include "test_generated.h"
+
+#if defined(LAB_WINDOWS)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
+#endif
+
 #include "lest.hpp"
 
 const lest::test specification[] = {
@@ -110,6 +119,81 @@ const lest::test specification[] = {
     EXPECT(control == result);
     EXPECT(base == lab::paths::DirName(result));
   },
+
+  CASE("lab::packet (fstream)") {
+    auto path = std::string("test.bin");
+    auto writer = lab::io::Fopen(path, "wb");
+    EXPECT(!!writer);
+
+    flatbuffers::FlatBufferBuilder builder(1024);
+    auto pkt = CreateTestPacket(builder, 42, 3.14f);
+    builder.Finish(pkt);
+
+    lab::packet::Fwrite(builder, writer);
+    fclose(writer);
+
+    auto reader = lab::io::Fopen(path, "rb");
+    EXPECT(!!reader);
+    auto blob = lab::packet::Fread(reader);
+    fclose(reader);
+
+    auto rpkt = GetTestPacket(blob);
+    EXPECT(rpkt->answer() == 42);
+    EXPECT(3.13f < rpkt->pi());
+    EXPECT(rpkt->pi() < 3.15f);
+    delete[] blob;
+  },
+
+#if defined(LAB_WINDOWS)
+  CASE("lab::packet (HANDLE)") {
+    const wchar_t *path = L"test.bin";
+    auto writer = CreateFileW(path, GENERIC_WRITE, 0, nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
+    EXPECT(!!writer);
+
+    flatbuffers::FlatBufferBuilder builder(1024);
+    auto pkt = CreateTestPacket(builder, 42, 3.14f);
+    builder.Finish(pkt);
+
+    lab::packet::Hwrite(builder, writer);
+    CloseHandle(writer);
+
+    auto reader = CreateFileW(path, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    EXPECT(!!reader);
+    auto blob = lab::packet::Hread(reader);
+    CloseHandle(reader);
+
+    auto rpkt = GetTestPacket(blob);
+    EXPECT(rpkt->answer() == 42);
+    EXPECT(3.13f < rpkt->pi());
+    EXPECT(rpkt->pi() < 3.15f);
+    delete[] blob;
+  },
+#else // LAB_WINDOWS
+  CASE("lab::packet (syscall)") {
+    const char *path = "test.bin";
+    auto writer = open(path, O_CREAT | O_TRUNC | O_WRONLY);
+    EXPECT(!!writer);
+
+    flatbuffers::FlatBufferBuilder builder(1024);
+    auto pkt = CreateTestPacket(builder, 42, 3.14f);
+    builder.Finish(pkt);
+
+    lab::packet::Write(builder, writer);
+    close(writer);
+
+    auto reader = open(path, O_RDONLY);
+    EXPECT(!!reader);
+    auto blob = lab::packet::Fread(reader);
+    close(reader);
+
+    auto rpkt = GetTestPacket(blob);
+    EXPECT(rpkt->answer() == 42);
+    EXPECT(3.13f < rpkt->pi());
+    EXPECT(rpkt->pi() < 3.15f);
+    delete[] blob;
+  },
+
+#endif // !LAB_WINDOWS
 };
 
 int main (int argc, char *argv[]) {

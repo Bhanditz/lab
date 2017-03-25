@@ -26,14 +26,18 @@ namespace packet {
 
 char *Fread(FILE *file) {
     uint32_t pkt_size = 0;
-    int read_bytes = fread(&pkt_size, sizeof(pkt_size), 1, file);
+    auto read_bytes = fread(&pkt_size, sizeof(pkt_size), 1, file);
     if (read_bytes == 0) {
         // closed pipe
         return nullptr;
     }
 
     char *buffer = new char[pkt_size];
-    fread(buffer, pkt_size, 1, file);
+    read_bytes = fread(buffer, pkt_size, 1, file);
+    if (read_bytes == 0) {
+        // closed pipe
+        return nullptr;
+    }
     return buffer;
 }
 
