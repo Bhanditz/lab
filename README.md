@@ -1,7 +1,7 @@
 # lab
 
-lab is a support library shared both by capsulerun and libcapsule. it contains
-among other things:
+lab is a support library used, for example, in [capsule](https://github.com/itchio/capsule). it contains
+things like:
 
   * string manipulation routines
   * path manipulation routines
