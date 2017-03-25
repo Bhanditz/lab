@@ -185,7 +185,7 @@ const lest::test specification[] = {
 
     auto reader = open(path, O_RDONLY);
     EXPECT(!!reader);
-    auto blob = lab::packet::Fread(reader);
+    auto blob = lab::packet::Read(reader);
     close(reader);
 
     auto rpkt = GetTestPacket(blob);
