@@ -25,6 +25,10 @@ namespace lab {
 namespace packet {
 
 char *Fread(FILE *file) {
+    if (!file) {
+        return nullptr;
+    };
+
     uint32_t pkt_size = 0;
     auto read_bytes = fread(&pkt_size, sizeof(pkt_size), 1, file);
     if (read_bytes == 0) {
@@ -42,6 +46,8 @@ char *Fread(FILE *file) {
 }
 
 void Fwrite(const flatbuffers::FlatBufferBuilder &builder, FILE *file) {
+    if (!file) return;
+
     uint32_t pkt_size = builder.GetSize();
     fwrite(&pkt_size, sizeof(pkt_size), 1, file);
     fwrite(builder.GetBufferPointer(), builder.GetSize(), 1, file);
