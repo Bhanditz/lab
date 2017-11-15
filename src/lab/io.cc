@@ -21,6 +21,10 @@
 
 #include "io.h"
 
+#ifndef _SH_DENYNO
+#define _SH_DENYNO 0x40
+#endif // _SH_DENYNO
+
 namespace lab {
 namespace io {
 
